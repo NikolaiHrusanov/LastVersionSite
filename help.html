@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" class="dark-theme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Help &amp; Support | NexusBank</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/help.css">
+    <style>
+        /* ── Design tokens ── */
+        :root {
+            --primary:          #6C5CE7;
+            --primary-dark:     #5648c7;
+            --secondary:        #A463F5;
+            --accent:           #00CEC9;
+            --cta:              #00B894;
+            --success:          #00B894;
+            --error:            #E84393;
+            --warn:             #FDCB6E;
+            --bg-primary:       #0D0F1A;
+            --bg-secondary:     #13162A;
+            --bg-tertiary:      #1A1E35;
+            --surface:          #1A1E35;
+            --surface-elevated: #212644;
+            --surface-hover:    #272D50;
+            --border-light:     rgba(255,255,255,0.08);
+            --border-medium:    rgba(255,255,255,0.14);
+            --border-input:     rgba(255,255,255,0.15);
+            --text-primary:     #F0F2FF;
+            --text-secondary:   #A8AFCB;
+            --text-tertiary:    #6B7499;
+            --shadow-sm:  0 2px 8px  rgba(0,0,0,0.35);
+            --shadow-md:  0 6px 24px rgba(0,0,0,0.40);
+            --shadow-lg:  0 16px 48px rgba(0,0,0,0.50);
+            --shadow-xl:  0 28px 72px rgba(0,0,0,0.60);
+            --radius-xs: 6px;
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 36px;
+            --ease:     cubic-bezier(0.4,0,0.2,1);
+            --ease-out: cubic-bezier(0,0,0.2,1);
+            --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { height:100%; -webkit-font-smoothing:antialiased; scroll-behavior:smooth; }
+        html, body {
+            background: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+            font-family: var(--font-body);
+            min-height: 100%;
+            line-height: 1.6;
+        }
+
+        /* ── Animated background ── */
+        .auth-background { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+        .auth-background::before {
+            content:''; position:absolute; inset:-10%; width:120%; height:120%;
+            background:
+                radial-gradient(ellipse 70% 60% at 18% 52%, rgba(108,92,231,0.18) 0%, transparent 65%),
+                radial-gradient(ellipse 55% 55% at 82% 16%, rgba(164,99,245,0.14)  0%, transparent 60%),
+                radial-gradient(ellipse 40% 45% at 55% 96%, rgba(0,206,201,0.10)   0%, transparent 55%);
+            animation: bgRotate 36s linear infinite;
+        }
+        .auth-background::after {
+            content:''; position:absolute; inset:-10%; width:120%; height:120%;
+            background:
+                radial-gradient(ellipse 50% 45% at 72% 78%, rgba(0,184,148,0.08)  0%, transparent 55%),
+                radial-gradient(ellipse 35% 35% at  8% 12%, rgba(108,92,231,0.12) 0%, transparent 50%);
+            animation: bgRotate 28s linear infinite reverse;
+        }
+        @keyframes bgRotate { to { transform: rotate(360deg); } }
+
+        /* ── Layout ── */
+        .app-container { position:relative; z-index:1; display:flex; min-height:100vh; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width:260px; background:var(--bg-secondary); border-right:1px solid var(--border-light);
+            display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0;
+            z-index:200; transition:transform 0.3s var(--ease);
+            scrollbar-width:thin; scrollbar-color:rgba(108,92,231,0.3) transparent;
+        }
+        .sidebar::-webkit-scrollbar { width:4px; }
+        .sidebar::-webkit-scrollbar-track { background:transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background:rgba(108,92,231,0.3); border-radius:4px; }
+        .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:199; backdrop-filter:blur(4px); }
+        .sidebar-overlay.active { display:block; }
+        .sidebar-header { padding:1.5rem; border-bottom:1px solid var(--border-light); }
+        .brand { display:flex; align-items:center; gap:0.75rem; text-decoration:none; color:var(--text-primary); font-weight:700; font-size:1.25rem; }
+        .brand-logo { width:36px; height:36px; background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem; box-shadow:0 4px 16px rgba(108,92,231,0.4); }
+        .brand-accent { background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .sidebar-user { display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem 0.75rem; padding:1.1rem 1.5rem; border-bottom:1px solid var(--border-light); }
+        .sidebar-user .user-avatar { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1rem; color:#fff; box-shadow:0 4px 12px rgba(108,92,231,0.3); }
+        .sidebar-user .user-name  { font-weight:600; font-size:0.9rem; color:var(--text-primary); }
+        .sidebar-user .user-email { font-size:0.82rem; color:var(--text-tertiary); width:100%; padding-left:0.5rem; }
+        .nav-section { margin-bottom:1.5rem; }
+        .nav-section-title { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-tertiary); padding:0 1.5rem 0.5rem; }
+        .sidebar-nav { flex:1; overflow-y:auto; padding-top:0.5rem; scrollbar-width:thin; scrollbar-color:rgba(108,92,231,0.3) transparent; }
+        .sidebar-nav::-webkit-scrollbar { width:4px; }
+        .sidebar-nav::-webkit-scrollbar-track { background:transparent; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(108,92,231,0.3); border-radius:4px; }
+        .sidebar-nav .nav-item { display:flex; align-items:center; gap:0.75rem; padding:0.65rem 1.5rem; text-decoration:none; color:var(--text-secondary); font-weight:500; font-size:0.88rem; transition:all 0.2s var(--ease); position:relative; }
+        .sidebar-nav .nav-item:hover { background:rgba(108,92,231,0.08); color:var(--text-primary); }
+        .sidebar-nav .nav-item.active { background:rgba(108,92,231,0.15); color:#A463F5; }
+        .sidebar-nav .nav-item.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,var(--primary),var(--secondary)); border-radius:0 2px 2px 0; }
+        .nav-item-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:var(--radius-xs); font-size:0.88rem; background:var(--surface); border:1px solid var(--border-light); flex-shrink:0; transition:background 0.2s; }
+        .sidebar-nav .nav-item.active .nav-item-icon { background:rgba(108,92,231,0.2); border-color:rgba(108,92,231,0.35); color:#A463F5; }
+        .sidebar-footer { padding:1rem 1.5rem; border-top:1px solid var(--border-light); flex-shrink:0; background:var(--bg-secondary); position:sticky; bottom:0; z-index:10; }
+        .sidebar-footer .btn-ghost { display:flex; align-items:center; gap:0.5rem; background:none; border:none; cursor:pointer; color:var(--text-tertiary); font-size:0.875rem; font-weight:500; padding:0.6rem 1rem; border-radius:var(--radius-sm); text-decoration:none; transition:all 0.2s; width:100%; font-family:var(--font-body); }
+        .sidebar-footer .btn-ghost:hover { background:rgba(108,92,231,0.12); color:#A463F5; }
+
+        /* ── Main content ── */
+        .main-content { flex:1; margin-left:260px; min-height:100vh; display:flex; flex-direction:column; }
+        .main-header { background:rgba(19,22,42,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-bottom:1px solid var(--border-light); padding:1.1rem 2rem; display:flex; align-items:center; gap:1rem; position:sticky; top:0; z-index:100; }
+        .mobile-menu-btn { display:none; background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.25rem; width:40px; height:40px; align-items:center; justify-content:center; border-radius:var(--radius-sm); }
+        .header-title { flex:1; }
+        .header-title h1 { font-size:1.2rem; font-weight:700; margin:0; color:var(--text-primary); }
+        .header-title p  { font-size:0.78rem; color:var(--text-tertiary); margin:0; }
+        .header-actions  { display:flex; align-items:center; gap:0.75rem; }
+        .btn-primary { display:inline-flex; align-items:center; gap:0.5rem; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; border:none; cursor:pointer; padding:0.6rem 1.25rem; border-radius:var(--radius-sm); font-weight:600; font-size:0.875rem; text-decoration:none; font-family:var(--font-body); box-shadow:0 4px 16px rgba(108,92,231,0.35); transition:transform 180ms var(--ease), box-shadow 180ms var(--ease); }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(108,92,231,0.5); }
+        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
+        .btn-secondary { display:inline-flex; align-items:center; gap:0.5rem; background:var(--surface-elevated); color:var(--text-primary); border:1px solid var(--border-medium); cursor:pointer; padding:0.6rem 1.25rem; border-radius:var(--radius-sm); font-weight:500; font-size:0.875rem; text-decoration:none; font-family:var(--font-body); transition:all 180ms var(--ease); }
+        .btn-secondary:hover { background:var(--surface-hover); border-color:var(--border-input); }
+        .page-body { padding:2rem; max-width:1100px; width:100%; margin:0 auto; }
+
+        /* ── Quick-card icon colours ── */
+        .help-quick-card:nth-child(1) .help-quick-icon { background:rgba(108,92,231,0.18); color:var(--secondary); }
+        .help-quick-card:nth-child(2) .help-quick-icon { background:rgba(0,206,201,0.15);  color:var(--accent); }
+        .help-quick-card:nth-child(3) .help-quick-icon { background:rgba(0,184,148,0.15);  color:var(--success); }
+        .help-quick-card:nth-child(4) .help-quick-icon { background:rgba(232,67,147,0.15); color:var(--error); }
+
+        /* ── Chat ── */
+        .chat-card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .chat-card-head h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .chat-card-head h3 i { color: var(--secondary); }
+        .chat-online-dot {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--success);
+        }
+        .chat-online-dot::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 2px rgba(0,184,148,0.25);
+            animation: chatPulse 2s ease-in-out infinite;
+        }
+        @keyframes chatPulse { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
+
+        .chat-messages {
+            height: 380px;
+            overflow-y: auto;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(108,92,231,0.3) transparent;
+        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(108,92,231,0.3); border-radius: 4px; }
+
+        .chat-bubble-wrap {
+            display: flex;
+            flex-direction: column;
+            max-width: 78%;
+            gap: 0.2rem;
+        }
+        .chat-bubble-wrap--user    { align-self: flex-end;  align-items: flex-end; }
+        .chat-bubble-wrap--support { align-self: flex-start; align-items: flex-start; }
+
+        .chat-bubble {
+            padding: 0.65rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            line-height: 1.55;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .chat-bubble--user {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            border-bottom-right-radius: var(--radius-xs);
+        }
+        .chat-bubble--support {
+            background: var(--surface-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+            border-bottom-left-radius: var(--radius-xs);
+        }
+        .chat-ts {
+            font-size: 0.68rem;
+            color: var(--text-tertiary);
+            padding: 0 0.25rem;
+        }
+        .chat-empty {
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 0.88rem;
+            margin: auto;
+            padding: 1.5rem 0;
+        }
+
+        .chat-input-area {
+            border-top: 1px solid var(--border-light);
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+        }
+        .chat-input-row {
+            display: flex;
+            gap: 0.65rem;
+            align-items: flex-end;
+        }
+        .chat-input {
+            flex: 1;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            padding: 0.65rem 0.9rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-input);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+            scrollbar-width: thin;
+            overflow-y: hidden;
+        }
+        .chat-input::placeholder { color: var(--text-tertiary); }
+        .chat-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,92,231,0.2); }
+
+        .chat-send-btn {
+            width: 44px; height: 44px;
+            flex-shrink: 0;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 4px 12px rgba(108,92,231,0.35);
+        }
+        .chat-send-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+        .chat-send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+        .chat-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.4rem;
+        }
+        .chat-hint       { font-size: 0.7rem; color: var(--text-tertiary); }
+        .chat-char-count { font-size: 0.7rem; color: var(--text-tertiary); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .sidebar { transform:translateX(-100%); }
+            .sidebar.active { transform:translateX(0); }
+            .main-content { margin-left:0; }
+            .mobile-menu-btn { display:flex; }
+            .page-body { padding:1.25rem; }
+            .chat-messages { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-background"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="accounts.html" class="brand">
+                <div class="brand-logo"><i class="fas fa-bolt"></i></div>
+                <span>Nexus<span class="brand-accent">Bank</span></span>
+            </a>
+        </div>
+        <div class="sidebar-user">
+            <div class="user-avatar"></div>
+            <div class="user-name"></div>
+            <div class="user-email"></div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">BANKING</div>
+                <a href="accounts.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-wallet"></i></div><span>Accounts</span></a>
+                <a href="transactions.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-history"></i></div><span>Transactions</span></a>
+                <a href="transfer.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-exchange-alt"></i></div><span>Transfers</span></a>
+                <a href="cards.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-credit-card"></i></div><span>Cards</span></a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">FINANCES</div>
+                <a href="savings.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-piggy-bank"></i></div><span>Savings</span></a>
+                <a href="loans.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-hand-holding-usd"></i></div><span>Loans</span></a>
+                <a href="bills.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-file-invoice-dollar"></i></div><span>Bills</span></a>
+                <a href="statements.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-file-alt"></i></div><span>Statements</span></a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">ACCOUNT</div>
+                <a href="profile.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-user-circle"></i></div><span>Profile</span></a>
+                <a href="security.html" class="nav-item"><div class="nav-item-icon"><i class="fas fa-shield-alt"></i></div><span>Security</span></a>
+                <a href="help.html" class="nav-item active"><div class="nav-item-icon"><i class="fas fa-question-circle"></i></div><span>Help</span></a>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="sign-in.html" class="btn-ghost" id="signOutBtn">
+                <i class="fas fa-sign-out-alt"></i><span>Sign Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <header class="main-header">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-title">
+                <h1>Help &amp; Support</h1>
+                <p>Find answers, contact us, or chat with our support team</p>
+            </div>
+            <div class="header-actions">
+                <a href="help/System-Status/index.html" class="btn-secondary">
+                    <i class="fas fa-server"></i> System Status
+                </a>
+            </div>
+        </header>
+
+        <div class="page-body">
+
+            <!-- Setup banner (hidden; shown by JS when tables are missing) -->
+            <div id="helpSetupBanner" class="help-setup-banner" hidden>
+                <i class="fas fa-database"></i>
+                <div>
+                    <strong>Supabase help tables not found.</strong>
+                    Run <code>supabase/help-schema.sql</code> in the SQL Editor to enable support ticket submission.
+                    See <code>supabase/SETUP_HELP.md</code> for details.
+                </div>
+            </div>
+
+            <!-- Hero search -->
+            <section class="help-hero" aria-label="Help search">
+                <div class="help-hero-text">
+                    <h2>How can we help you?</h2>
+                    <p>Search our knowledge base or browse topics below.</p>
+                </div>
+                <div class="help-search-wrap">
+                    <i class="fas fa-search help-search-icon"></i>
+                    <input
+                        type="search"
+                        id="helpSearchInput"
+                        class="help-search-input"
+                        placeholder="Search for answers&hellip;"
+                        autocomplete="off"
+                        aria-label="Search help articles"
+                    />
+                    <span id="helpSearchClear" class="help-search-clear" hidden>
+                        <i class="fas fa-times"></i>
+                    </span>
+                </div>
+            </section>
+
+            <!-- Quick links -->
+            <section class="help-quick-section" aria-label="Quick links">
+                <div class="help-quick-grid">
+                    <a href="help/Help-Centre/index.html" class="help-quick-card">
+                        <div class="help-quick-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="help-quick-body"><div class="help-quick-title">Help Centre</div><div class="help-quick-desc">Browse articles and guides</div></div>
+                        <i class="fas fa-chevron-right help-quick-arrow"></i>
+                    </a>
+                    <a href="help/Contact-Us/index.html" class="help-quick-card">
+                        <div class="help-quick-icon"><i class="fas fa-headset"></i></div>
+                        <div class="help-quick-body"><div class="help-quick-title">Contact Us</div><div class="help-quick-desc">Chat, email, or call support</div></div>
+                        <i class="fas fa-chevron-right help-quick-arrow"></i>
+                    </a>
+                    <a href="help/System-Status/index.html" class="help-quick-card">
+                        <div class="help-quick-icon"><i class="fas fa-server"></i></div>
+                        <div class="help-quick-body"><div class="help-quick-title">System Status</div><div class="help-quick-desc">Check service availability</div></div>
+                        <i class="fas fa-chevron-right help-quick-arrow"></i>
+                    </a>
+                    <a href="security.html" class="help-quick-card">
+                        <div class="help-quick-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="help-quick-body"><div class="help-quick-title">Security Guide</div><div class="help-quick-desc">Protect your account</div></div>
+                        <i class="fas fa-chevron-right help-quick-arrow"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Two-column: FAQ + Ticket form -->
+            <div class="help-main-grid">
+
+                <!-- FAQ -->
+                <section class="help-card" aria-label="Frequently asked questions">
+                    <div class="help-card-head">
+                        <h3><i class="fas fa-circle-question"></i> Frequently Asked Questions</h3>
+                        <span id="faqCount" class="help-badge">8 articles</span>
+                    </div>
+                    <p class="help-card-lead">Quick answers to common banking questions.</p>
+                    <div id="faqList" class="faq-list">
+
+                        <div class="faq-item">
+                            <button class="faq-question" aria-expanded="false" type="button">
+                                <span>How do I transfer money between accounts?</span>
+                                <i class="fas fa-chevron-down faq-chevron"></i>
+                            </button>
+                            <div class="faq-answer" hidden>
+                                <p>Go to <strong>Transfers</strong> in the sidebar. Select your source account, enter the destination account number or choose from your saved payees, enter the amount, and confirm. Transfers between your own NexusBank accounts are instant. External transfers may take 1&ndash;3 business days.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question" aria-expanded="false" type="button">
+                                <span>How do I dispute a transaction?</span>
+                                <i class="fas fa-chevron-down faq-chevron"></i>
+                            </button>
+                            <div class="faq-answer" hidden>
+                                <p>Open <strong>Transactions</strong>, find the charge you want to dispute, and tap <em>Report a problem</em>. Fill in the dispute form and submit. Our team will investigate within 5&ndash;10 business days and email you with the outcome. For urgent fraud, use the <strong>Contact Us</strong> page to reach us immediately.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question" aria-expanded="false" type="button">
+                                <span>How do I enable two-factor authentication?</span>
+                                <i class="fas fa-chevron-down faq-chevron"></i>
+                            </button>
+                            <div class="faq-answer" hidden>
+                                <p>Go to <strong>Security</strong> in the sidebar and toggle on <em>Two-factor authentication</em>. You will be prompted to verify your email address. Once confirmed, a one-time code will be required every time you sign in from a new device.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question" aria-expanded="false" type="button">
+                                <span>What are the daily transfer limits?</span>
+                                <i class="fas fa-chevron-down faq-chevron"></i>
+                            </button>
+                            <div class="faq-answer" hidden>
+                                <p>Standard accounts have a daily outbound transfer limit of <strong>$10,000</strong>. Premium accounts have a limit of <strong>$50,000</strong>. Limits reset at midnight UTC. To request a temporary increase, submit a support ticket below or contact us directly.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question" aria-expanded="false" type="button">
+                                <span>How do I update my personal information?</span>
+                                <i class="fas fa-chevron-down faq-chevron"></i>
+                            </button>
+                            <div class="faq-answer" hidden>
+                                <p>Visit your <strong>Profile</strong> page from the sidebar. You can update your display name, phone number, and address there. Changes to your legal name or date of birth require identity verification &mdash; submit a support ticket and our team will guide you through the process.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question" aria-expanded="false" type="button">
+                                <span>How do I freeze or unfreeze my card?</span>
+                                <i class="fas fa-chevron-down faq-chevron"></i>
+                            </button>
+                            <div class="faq-answer" hidden>
+                                <p>Go to <strong>Cards</strong> in the sidebar, select the card you want to manage, and tap the <em>Freeze card</em> toggle. Freezing is instant and prevents all new transactions. You can unfreeze at any time. If your card is lost or stolen, use the <em>Report lost/stolen</em> option to permanently block it and request a replacement.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question" aria-expanded="false" type="button">
+                                <span>How do I download my bank statement?</span>
+                                <i class="fas fa-chevron-down faq-chevron"></i>
+                            </button>
+                            <div class="faq-answer" hidden>
+                                <p>Open <strong>Statements</strong> from the sidebar. Select the account and the date range you need, then click <em>Download PDF</em>. Statements are generated instantly for the past 24 months. For older records, submit a support ticket and we will prepare them within 2 business days.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <button class="faq-question" aria-expanded="false" type="button">
+                                <span>What should I do if I forget my password?</span>
+                                <i class="fas fa-chevron-down faq-chevron"></i>
+                            </button>
+                            <div class="faq-answer" hidden>
+                                <p>On the <strong>Sign In</strong> page, click <em>Forgot password?</em> and enter your registered email address. You will receive a reset link within a few minutes. The link expires after 1 hour. If you do not receive the email, check your spam folder or contact support.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <p id="faqNoResults" class="help-empty" hidden>
+                        <i class="fas fa-search"></i> No articles match your search.
+                        Try different keywords or <a href="help/Contact-Us/index.html">contact us</a>.
+                    </p>
+                </section>
+
+                <!-- Support ticket form -->
+                <section class="help-card" aria-label="Submit a support ticket">
+                    <h3><i class="fas fa-ticket-alt"></i> Submit a Support Ticket</h3>
+                    <p class="help-card-lead">Can&rsquo;t find what you need? Send us a message and we&rsquo;ll get back to you within 24 hours.</p>
+                    <div id="ticketFormError"  class="help-form-error"  hidden></div>
+                    <div id="ticketFormSuccess" class="help-form-success" hidden></div>
+                    <form id="supportTicketForm" autocomplete="off" novalidate>
+                        <div class="help-form-group">
+                            <label for="ticketCategory">Category</label>
+                            <select id="ticketCategory" required>
+                                <option value="" disabled selected>Select a category&hellip;</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="account">Account Issue</option>
+                                <option value="transaction">Transaction Dispute</option>
+                                <option value="card">Card Issue</option>
+                                <option value="loan">Loan Query</option>
+                                <option value="technical">Technical Problem</option>
+                            </select>
+                        </div>
+                        <div class="help-form-group">
+                            <label for="ticketSubject">Subject</label>
+                            <input type="text" id="ticketSubject" placeholder="Brief description of your issue" required maxlength="120" />
+                        </div>
+                        <div class="help-form-group">
+                            <label for="ticketMessage">Message</label>
+                            <textarea id="ticketMessage" rows="5" placeholder="Please describe your issue in detail&hellip;" required maxlength="2000"></textarea>
+                            <div class="help-char-count"><span id="ticketMessageCount">0</span> / 2000</div>
+                        </div>
+                        <button type="submit" class="btn-primary" id="ticketSubmitBtn">
+                            <i class="fas fa-paper-plane"></i> Send Ticket
+                        </button>
+                    </form>
+                </section>
+
+            </div><!-- /.help-main-grid -->
+
+            <!-- Recent tickets (full width) -->
+            <section class="help-card help-card-full" aria-label="Your recent support tickets">
+                <div class="help-card-head">
+                    <h3><i class="fas fa-inbox"></i> Your Recent Tickets</h3>
+                    <span id="ticketsBadge" class="help-badge">Loading&hellip;</span>
+                </div>
+                <p class="help-card-lead">Track the status of your submitted support requests.</p>
+                <div id="recentTicketsList">
+                    <p class="help-empty"><i class="fas fa-spinner fa-spin"></i> Loading tickets&hellip;</p>
+                </div>
+            </section>
+        </br>
+        </br>
+            <!-- Live support chat (full width) -->
+            <section class="chat-card" aria-label="Live support chat">
+                <div class="chat-card-head">
+                    <h3><i class="fas fa-comments"></i> Live Support Chat</h3>
+                    <span class="chat-online-dot">Support online</span>
+                </div>
+
+                <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Chat messages">
+                    <p class="help-empty chat-empty">
+                        <i class="fas fa-spinner fa-spin"></i> Loading conversation&hellip;
+                    </p>
+                </div>
+
+                <div class="chat-input-area">
+                    <form id="chatForm" autocomplete="off" novalidate>
+                        <div class="chat-input-row">
+                            <textarea
+                                id="chatInput"
+                                class="chat-input"
+                                placeholder="Type a message&hellip;"
+                                rows="1"
+                                maxlength="2000"
+                                aria-label="Chat message"
+                            ></textarea>
+                            <button type="submit" id="chatSendBtn" class="chat-send-btn" disabled aria-label="Send message">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="chat-meta-row">
+                            <span class="chat-hint">Enter to send &middot; Shift+Enter for new line</span>
+                            <span class="chat-char-count" id="chatCharCount">0 / 2000</span>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+        </div><!-- /.page-body -->
+    </main>
+</div><!-- /.app-container -->
+
+<div id="helpToastContainer" class="help-toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/money-management.js"></script>
+<script src="js/help.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+        const session = await NexusAuth.requireAuthWithProfile();
+        if (!session) return;
+        await NexusHelp.initHelpPage(session.user);
+    });
+</script>
+</body>
+</html>
